@@ -2,8 +2,7 @@ const urlModel = require("../models/urlModel")
 const shortId = require('shortid')
 const redis = require('redis')
 const { promisify } = require('util')
-const url = require('validator')
-
+const validUrl = require('valid-url')
 
 // ---------------- VALIDATIONS -------------
 const isValid = function (value) {
@@ -20,7 +19,7 @@ const isValidReqBody = function (requestBody) {
 
 const redisClient = redis.createClient(
     13679,                                                          // port no
-    "redis-13679.c264.ap-south-1-1.ec2.cloud.redislabs.com",   //endpoint
+    "redis-13679.c264.ap-south-1-1.ec2.cloud.redislabs.com",   //endpoint(hostname)
     { no_ready_check: true }
 );
 redisClient.auth("DJVYDAOFdh0QfAGosRci58kpc2bjKkjD",    //password - performing authentication
@@ -52,7 +51,7 @@ const createUrl = async function (req, res) {
             return res.status(400).send({ status: false, message: "Invalid parameters...! Please provide longURL" })
         }
 
-        if (!url.isURL(longUrl)){
+        if (!validUrl.isUri(longUrl)){
              return res.status(400).send({ status: false, message: "please provide a valid long URL" })
         }
         // ---------- Getting Data from Cache
